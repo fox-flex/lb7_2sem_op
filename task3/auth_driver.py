@@ -14,17 +14,13 @@ permissions = ('su', 'add permission', 'read document', 'create user')
 class Editor:
     def __init__(self):
         self.username = None
-        self.notebook = None
         self.menu_map = {
             "login": self.login,
             "add permission": self.add_permission_so_sb,
             "add user": self.add_new_user,
-            # "read doc": self.read_doc,
-            "read notebook": self.read_notebook,
-            # "change doc": self.change_doc,
-            "change notebook": self.change_notebook,
-            # "save doc": self.save_doc,
-            "save notebook": self.save_notebook,
+            "read doc": self.read_doc,
+            "change doc": self.change_doc,
+            "save doc": self.save_doc,
             "quit": self.quit,
         }
         self.permissions = {'0': 'su', '1': 'add permission',
@@ -43,8 +39,6 @@ class Editor:
                 print("Sorry, incorrect password")
             else:
                 self.username = username
-                self.notebook = auth.authenticator.users[
-                                                        self.username].notebook
                 print('You successfully log in!')
 
     def is_permitted(self, permission):
@@ -110,16 +104,10 @@ class Editor:
             print(f'You successfully add permission of {permission} to '
                   f'user {nickname}!')
 
-    def read_notebook(self):
-        if self.is_permitted("read notebook"):
+    def read_doc(self):
+        if self.is_permitted("read doc"):
             print('Your doc:\n' + '_' * 60)
             print(auth.authenticator.users[self.username].document)
-            if not self.notebook:
-                print('your notebook is empty')
-                # notes = self.notebook.notes
-            else:
-                for note in self.notebook:
-                    print(f"ID: {note.id}; tags: {note.tags}\n{note.memo}")
             print('_' * 60)
 
     def change_doc(self):
@@ -156,7 +144,6 @@ class Editor:
                 for _ in range(num_line_to_change):
                     doc.cursor.end()
                     doc.cursor.forward()
-                print(doc.cursor.position)
                 while len(doc.characters) > doc.cursor.position and\
                         doc.characters[doc.cursor.position] != '\n':
                     doc.delete()
@@ -195,98 +182,7 @@ class Editor:
                             doc.cursor.forward()
                     except GoOutOfDoc:
                         doc.insert(auth.Character('\n'))
-                # while doc.characters[doc.cursor.position] != '\n':
-                #     doc.delete()
-                is_bold = input('type \'y\' if this line should be bold:\t')
-                is_italic = input('type \'y\' if this line should be '
-                                  'italic:\t')
-                is_underline = input('type \'y\' if this line should be '
-                                     'underline:\t')
-                new_text = input('enter new text in this line:\n')
-                for char in new_text:
-                    doc.insert(auth.Character(char, bold=is_bold,
-                                              italic=is_italic,
-                                              underline=is_underline))
-                doc.insert(auth.Character('\n', bold=is_bold,
-                                          italic=is_italic,
-                                          underline=is_underline))
-            doc.cursor.position = 0
 
-    def change_notebook(self):
-        if self.is_permitted("change notebook"):
-            # print('Your doc:\n' + '_' * 60)
-            # print(doc)
-            # print('_' * 60)
-            print('what you wanna to do?')
-            chooses = {'0': 'change some note', '1': 'add new note'}
-            for i, choose in chooses.items():
-                print(f'{i}\t- {choose}')
-            while True:
-                choose = input("enter a number of command: ")
-                try:
-                    choose = chooses[choose]
-                    break
-                except KeyError:
-                    print(f"'{choose}' is not a valid number, try again!")
-            num_lines = str(self.notebook).count('\n') + 1
-            if choose == 'change some note':
-                print(f'there are {len(self.notebook.notes)} notes')
-                while True:
-                    num_line_to_change = input("enter a ID of note "
-                                               "which you wanna change: ")
-                    try:
-                        num_line_to_change = int(num_line_to_change)
-                        if not (0 < num_line_to_change <
-                                self.notebook.notes+1):
-                            raise ValueError
-                        break
-                    except (TypeError, ValueError):
-                        print(f"'{choose}' is not a valid number, try again!\n")
-
-                for _ in range(num_line_to_change):
-                    doc.cursor.end()
-                    doc.cursor.forward()
-                print(doc.cursor.position)
-                while len(doc.characters) > doc.cursor.position and\
-                        doc.characters[doc.cursor.position] != '\n':
-                    doc.delete()
-
-                is_bold = input('type \'y\' if this line should be bold:\t')
-                is_italic = input('type \'y\' if this line should be '
-                                  'italic:\t')
-                is_underline = input('type \'y\' if this line should be '
-                                     'underline:\t')
-                new_text = input('enter new text in this line:\n')
-                for char in new_text:
-                    doc.insert(auth.Character(char, bold=is_bold,
-                                              italic=is_italic,
-                                              underline=is_underline))
-            elif choose == 'add new line':
-                print(f'there are {num_lines} lines')
-                while True:
-                    line_before_which_add = input("enter a number of line, "
-                                                  "after which you wanna add "
-                                                  "one more line: ")
-                    try:
-                        line_before_which_add = int(line_before_which_add)
-                        if not (0 <= line_before_which_add < num_lines):
-                            raise ValueError
-                        break
-                    except (TypeError, ValueError):
-                        print(f"'{line_before_which_add}' is not a valid "
-                              f"number, try again!\n")
-                if not line_before_which_add == 0:
-                    after_line = input('if you want to insert line after '
-                                       'taken line print \'y\': ') == 'y'
-                    after_line = 1 if after_line else 0
-                    try:
-                        for _ in range(line_before_which_add + after_line):
-                            doc.cursor.end()
-                            doc.cursor.forward()
-                    except GoOutOfDoc:
-                        doc.insert(auth.Character('\n'))
-                # while doc.characters[doc.cursor.position] != '\n':
-                #     doc.delete()
                 is_bold = input('type \'y\' if this line should be bold:\t')
                 is_italic = input('type \'y\' if this line should be '
                                   'italic:\t')
@@ -304,23 +200,13 @@ class Editor:
 
     def save_doc(self):
         if self.is_permitted("change doc"):
-            file_name0 = f'./docs/doc_{self.username}'
-            file_name = file_name0
+            file = f'./docs/doc_{self.username}.txt'
+            file_c = f'./docs/doc_{self.username}'
             num = 0
-            while path.exists(file_name):
-                file_name = file_name0 + f'_{num}'
+            while path.exists(file):
+                file = file_c + f'_{num}.txt'
                 num += 1
-            auth.authenticator.users[self.username].document.save(file_name)
-
-    def save_notebook(self):
-        if self.is_permitted("change doc"):
-            file_name0 = f'./docs/doc_{self.username}'
-            file_name = file_name0
-            num = 0
-            while path.exists(file_name):
-                file_name = file_name0 + f'_{num}'
-                num += 1
-            auth.authenticator.users[self.username].document.save(file_name)
+            auth.authenticator.users[self.username].document.save(file)
 
     def quit(self):
         raise SystemExit()
@@ -337,9 +223,9 @@ Please enter a command:
 \t1 - login\tLogin
 \t2 - add permission\tAdd permission of something to somebody
 \t3 - add user\tAdd new user
-\t4 - read notebook\tReed doc of this user
-\t5 - change notebook\tChange doc of this user
-\t6 - save notebook\tSave doc into the file
+\t4 - read doc\tReed doc of this user
+\t5 - change doc\tChange doc of this user
+\t6 - save doc\tSave doc into the file
 \t7 - quit\tQuit
 """
                 )

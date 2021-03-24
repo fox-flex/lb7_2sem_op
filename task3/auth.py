@@ -1,7 +1,6 @@
 import hashlib
-from notebook0 import Notebook
-# from document import Document
-# from document import Character
+from document import Document
+from document import Character
 
 
 class AuthException(Exception):
@@ -46,7 +45,7 @@ class User:
         self.username = username
         self.password = self._encrypt_pw(password)
         self.is_logged_in = False
-        self.document = Notebook()
+        self.document = Document()
 
     def _encrypt_pw(self, password):
         """Encrypt the password with the username and return
@@ -91,21 +90,6 @@ class Authenticator:
         if username in self.users:
             return self.users[username].is_logged_in
         return False
-
-    def read_notebook(self):
-        if not notes:
-            notes = self.notebook.notes
-        for note in notes:
-            print("{0}: {1}\n{2}".format(note.id, note.tags, note.memo))
-
-    def change_notebook(self):
-        pass
-
-    def save_doc(self):
-        pass
-
-    def save_notebook(self):
-        pass
 
 
 class Authorizor:
